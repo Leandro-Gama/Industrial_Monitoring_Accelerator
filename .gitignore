@@ -1,0 +1,91 @@
+# Compilação e Executáveis
+*.out
+*.exe
+*.o
+*.a
+*.s
+*.pyc
+
+# Simulação e Waveforms
+*.vcd
+*.ghw
+*.wlf
+*.log
+*.jou
+*.pb
+*.fmt
+
+# Icarus Verilog e GTKWave
+vvp_out
+*.gtkw
+
+# Vivado / Xilinx
+.Xil/
+*.str
+*.write_bitstream_log
+usage_statistics_webtalk.*
+vivado*.log
+vivado*.jou
+_x/
+.ip_user_files/
+
+# Quartus / Intel
+db/
+incremental_db/
+output_files/
+*.bak
+*.orig
+*.qws
+
+# VS Code e IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Cadence Xcelium (xrun) ---
+# Pasta de snapshots e compilação (padrão do xrun)
+xcelium.d/
+inca.lnx86.*/
+
+# Arquivos de log e histórico
+xrun.log
+xrun.history
+xrun.key
+
+# Banco de dados de formas de onda (Waveforms)
+*.shm/
+*.vcd
+*.vvp
+*.dsn
+*.trn
+
+# Arquivos de configuração e dump do SimVision
+simvision*/
+svlog*.vlog
+.simvision/
+
+# Bibliotecas compiladas (se você definiu nomes personalizados)
+*.bak
+*.sim
+
+# --- Python ---
+# Cache de compilação do Python 3
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes Virtuais
+myenv/
+venv/
+env/
+.venv/
+
+# Ferramentas de Teste e Linting
+.pytest_cache/
+.coverage
+htmlcov/
+
+~$*.pptx
+~$*.docx
+~$*.xlsx
