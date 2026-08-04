@@ -1,10 +1,7 @@
 # matrix_inv
 
 Four algorithm variants, one file each, all sharing the same external
-interface so `05.Sim/matrix_inv` can test them the same way. Rationale and
-numeric decisions (fixed-point format, epsilon, output scope) are in
-`02.Architecture/open_decisions.md` (matrix_inv - Sprint 0); this README
-only lists the resulting port list.
+interface so `05.Sim/matrix_inv` can test them the same way.
 
 | Module               | Algorithm                      | Status                  |
 | -------------------- | ------------------------------ | ----------------------- |
@@ -49,13 +46,11 @@ module matrix_inv_<algo> #(
 - `a_in`/`b_in` are captured on the `start` pulse; results are valid for
   one cycle on the `done` pulse (registered outputs, so they hold until
   the next `start`).
-- `singular` follows `EPSILON_Q88 = 4` (raw Q8.8 units) from
-  `02.Architecture/open_decisions.md`. When asserted, `x_out`/`ainv_out`
+- `singular` follows `EPSILON_Q88 = 4` (raw Q8.8 units) . When asserted, `x_out`/`ainv_out`
   content is undefined for that run.
 - Internal datapath width is left to each algorithm's implementation, not
   part of the port list — see the Sprint 0 fixed-point note (32-bit/Q16.16
   MAC intermediates, rescaled to Q8.8 on write-back). `matrix_inv_cof`
   additionally uses a 32-bit `WIDE_BITS` container for its internal
   cofactor/subdeterminant signals — plain Q8.8 overflows there even for
-  well-conditioned matrices (Sprint 2 finding, see
-  `02.Architecture/open_decisions.md`).
+  well-conditioned matrices.

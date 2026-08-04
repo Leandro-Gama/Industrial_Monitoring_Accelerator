@@ -5,8 +5,7 @@
  * (K-1)x(K-1) minors (row 0 removed, column j removed); K==1 is the
  * trivial base case (the single element). Fully combinational.
  * Internal terms/sums use WIDE_BITS (see common/q88_ops.vh) so a
- * well-conditioned matrix's minors don't overflow plain Q8.8 (see
- * 02.Architecture/open_decisions.md, Sprint 2). Every multiply/add is
+ * well-conditioned matrix's minors don't overflow plain Q8.8. Every multiply/add is
  * still rounded and saturated individually, matching
  * 03.Reference/matrix_inv/algorithms/cofactors.py:det_fixed bit-exactly.
  * Minor extraction is static wire routing: row/column to remove are

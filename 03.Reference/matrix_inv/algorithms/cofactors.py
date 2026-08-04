@@ -10,8 +10,8 @@ Bit-true fixed-point model mirrors the planned RTL 1:1
   - Internal subdeterminant/cofactor signals use WIDE_BITS (32) instead of
     plain Q8.8 (16): even a modest, well-conditioned 4x4 matrix routinely
     produces row-0-expansion terms that overflow Q8.8 (e.g. element 4.0 x
-    3x3-minor-determinant 41.0 = 164.0, already past Q8.8's ~128 max) --
-    see 02.Architecture/open_decisions.md. Same FRAC_BITS (8) throughout,
+    3x3-minor-determinant 41.0 = 164.0, already past Q8.8's ~128 max). 
+    Same FRAC_BITS (8) throughout,
     just more integer headroom; only a/b/x/A_inv stay 16-bit Q8.8.
   - The N^2 cofactors needed for the full adjugate are each an independent
     (N-1)x(N-1) determinant; det(A) itself is read off the row-0

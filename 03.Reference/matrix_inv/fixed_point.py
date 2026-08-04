@@ -21,12 +21,12 @@ ACC_MAX = (1 << (ACC_BITS - 1)) - 1
 # Wider container for cofactors.py's internal cofactor/subdeterminant
 # signals: same FRAC_BITS (8) as Q8.8, just more integer headroom, so a
 # well-conditioned matrix's minors don't saturate at every multiply the
-# way plain Q8.8 does at N=4 (see 02.Architecture/open_decisions.md).
+# way plain Q8.8 does at N=4.
 WIDE_BITS = 32
 WIDE_MIN = -(1 << (WIDE_BITS - 1))
 WIDE_MAX = (1 << (WIDE_BITS - 1)) - 1
 
-# Singularity threshold (02.Architecture/open_decisions.md): 4 LSB of Q8.8.
+# Singularity threshold: 4 LSB of Q8.8.
 EPSILON_Q88 = 4
 
 def _bit_range(bits):
