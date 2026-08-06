@@ -335,7 +335,7 @@ def update_max_abs(max_abs: dict[str, float], frame: pd.DataFrame) -> None:
 
 
 def quantize_q15(frame: pd.DataFrame, max_abs: dict[str, float]) -> pd.DataFrame:
-    q15_frame = frame[["sample_index", "time_s", "label", "fault_detail"]].copy()
+    q15_frame = frame[["label", "fault_detail"]].copy()
     for column in MEASUREMENT_COLUMNS:
         values = frame[column].to_numpy(dtype=np.float64, copy=False)
         scale = max_abs[column] if max_abs[column] > 0.0 else 1.0
