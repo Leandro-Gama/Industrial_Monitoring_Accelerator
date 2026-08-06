@@ -65,7 +65,6 @@ class SourceMetadata:
     source_id: str
     label: str
     fault_detail: str
-    load_nm: int
 
 
 @dataclass
@@ -179,7 +178,6 @@ def parse_source_metadata(stem: str) -> SourceMetadata:
     if not match:
         raise ValueError(f"Cannot parse source name: {stem}")
 
-    load_nm = int(match.group("load"))
     fault = match.group("fault")
     for token, label in LABELS.items():
         if fault.startswith(token):
@@ -191,7 +189,7 @@ def parse_source_metadata(stem: str) -> SourceMetadata:
                 detail = "misalign_" + fault.split("_", 1)[1]
             else:
                 detail = fault
-            return SourceMetadata(stem, label, detail, load_nm)
+            return SourceMetadata(stem, label, detail)
 
     raise ValueError(f"Cannot infer label from source name: {stem}")
 
@@ -295,7 +293,6 @@ def make_float_chunk_frame(
         "time_s": time_s,
         "label": metadata.label,
         "fault_detail": metadata.fault_detail,
-        "load_nm": metadata.load_nm,
     }
 
     vibration = mat_signal.values[start:stop]
@@ -326,6 +323,8 @@ def make_float_chunk_frame(
 
 
 def update_max_abs(max_abs: dict[str, float], frame: pd.DataFrame) -> None:
+    if frame.empty:
+        return
     for column in MEASUREMENT_COLUMNS:
         values = frame[column].to_numpy(dtype=np.float64, copy=False)
         if np.isnan(values).all():
@@ -336,7 +335,7 @@ def update_max_abs(max_abs: dict[str, float], frame: pd.DataFrame) -> None:
 
 
 def quantize_q15(frame: pd.DataFrame, max_abs: dict[str, float]) -> pd.DataFrame:
-    q15_frame = frame[["sample_index", "time_s", "label", "fault_detail", "load_nm"]].copy()
+    q15_frame = frame[["sample_index", "time_s", "label", "fault_detail"]].copy()
     for column in MEASUREMENT_COLUMNS:
         values = frame[column].to_numpy(dtype=np.float64, copy=False)
         scale = max_abs[column] if max_abs[column] > 0.0 else 1.0
@@ -345,10 +344,12 @@ def quantize_q15(frame: pd.DataFrame, max_abs: dict[str, float]) -> pd.DataFrame
         quantized = np.nan_to_num(quantized, nan=0.0, posinf=32767.0, neginf=-32768.0)
         q15_frame[column] = np.clip(quantized, -32768, 32767).astype(np.int16)
 
-    for column in TDMS_VALIDITY_COLUMNS:
-        q15_frame[column] = frame[column].to_numpy(dtype=bool, copy=False)
-
     return q15_frame
+
+
+def drop_missing_samples(frame: pd.DataFrame) -> pd.DataFrame:
+    valid_rows = frame[TDMS_VALIDITY_COLUMNS].all(axis=1)
+    return frame.loc[valid_rows].copy()
 
 
 def report_row(
@@ -367,7 +368,6 @@ def report_row(
         "source_id": metadata.source_id,
         "label": metadata.label,
         "fault_detail": metadata.fault_detail,
-        "load_nm": metadata.load_nm,
         "source_mat": mat_path.name,
         "source_tdms": tdms_path.name,
         "mat_samples": mat_signal.sample_count,
@@ -457,6 +457,7 @@ def build_dataset(args: argparse.Namespace) -> None:
                 start,
                 stop,
             )
+            frame = drop_missing_samples(frame)
             update_max_abs(max_abs, frame)
 
     write_scale_report(args.scale_report, max_abs)
@@ -484,6 +485,10 @@ def build_dataset(args: argparse.Namespace) -> None:
                     start,
                     stop,
                 )
+                frame = drop_missing_samples(frame)
+                if frame.empty:
+                    continue
+
                 q15_frame = quantize_q15(frame, max_abs)
                 table = pa.Table.from_pandas(q15_frame, preserve_index=False)
                 if writer is None:
